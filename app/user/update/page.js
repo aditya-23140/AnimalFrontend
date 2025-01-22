@@ -66,7 +66,7 @@ export default function AddPetForm() {
       const response = await fetch("http://localhost:8000/api/auth/pets/add/", {
         method: "POST",
         headers: {
-          "Authorization": `Bearer ${token}`,
+          Authorization: `Bearer ${token}`,
         },
         body: formData,
       });
@@ -101,7 +101,11 @@ export default function AddPetForm() {
                 Add Pet Details
               </h1>
 
-              <form id="submitForm" className="space-y-6" onSubmit={handleSubmit}>
+              <form
+                id="submitForm"
+                className="space-y-6"
+                onSubmit={handleSubmit}
+              >
                 <div className="space-y-4">
                   <div>
                     <label
@@ -264,7 +268,9 @@ export default function AddPetForm() {
                     placeholder="Enter any additional information about your pet"
                     rows="4"
                     value={pet.additionalInfo}
-                    onChange={(e) => handleChange("additionalInfo", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("additionalInfo", e.target.value)
+                    }
                   />
                 </div>
 
