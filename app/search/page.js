@@ -22,26 +22,18 @@ export default function SearchAnimal() {
     images.forEach((image) => formData.append("images", image));
 
     try {
-      const response = await fetch(
-        "http://localhost:8000/api/animals/search/",
-        {
-          method: "POST",
-          body: formData,
-        }
-      );
+      const response = await fetch("http://localhost:8000/api/search_animal/", {
+        method: "POST",
+        body: formData,
+      });
       const data = await response.json();
 
-      if (response.ok) {
-        if (data.success) {
-          setResults(data.matches);
-        } else {
-          setMessage(`Error: ${data.error}`);
-        }
+      if (data.success) {
+        setResults(data.matches);
       } else {
-        setMessage(`Error: ${data.error || "Unknown error"}`);
+        setMessage(`Error: ${data.error}`);
       }
     } catch (error) {
-      console.error(error);
       setMessage("An unexpected error occurred.");
     }
 
@@ -66,7 +58,6 @@ export default function SearchAnimal() {
             multiple
             onChange={handleImageUpload}
             className="w-full p-2 border border-gray-300 rounded"
-            required
           />
         </div>
 
@@ -86,7 +77,7 @@ export default function SearchAnimal() {
       )}
 
       {results.length > 0 && (
-        <div className="mt-6 w-full max-w-lg">
+        <div className="mt-6 w-full max-w-lg" style={{ color: "black" }}>
           <h2 className="text-lg font-bold mb-2">Search Results</h2>
           <ul className="space-y-4">
             {results.map((result, index) => (
@@ -108,6 +99,11 @@ export default function SearchAnimal() {
                       src={`http://localhost:8000/media/${img}`}
                       alt="Animal"
                       className="w-16 h-16 object-cover border border-gray-300 rounded"
+                      width={64}
+                      height={64}
+                      onError={(e) => {
+                        e.target.src = "/fallback-image.jpg"; // Fallback image if fails
+                      }}
                     />
                   ))}
                 </div>

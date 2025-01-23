@@ -1,5 +1,7 @@
 "use client";
+// pages/register.js
 import { useState } from "react";
+import Image from "next/image";
 
 export default function RegisterAnimal() {
   const [images, setImages] = useState([]);
@@ -20,7 +22,7 @@ export default function RegisterAnimal() {
 
     try {
       const response = await fetch(
-        "http://localhost:8000/api/animals/register/",
+        "http://localhost:8000/api/register_animal/",
         {
           method: "POST",
           body: formData,
@@ -28,19 +30,14 @@ export default function RegisterAnimal() {
       );
       const data = await response.json();
 
-      if (response.ok) {
-        if (data.success) {
-          setMessage(
-            `Animal registered successfully! Animal ID: ${data.animal_id}`
-          );
-        } else {
-          setMessage(`Error: ${data.error}`);
-        }
+      if (data.success) {
+        setMessage(
+          `Animal registered successfully! Animal ID: ${data.animal_id}`
+        );
       } else {
-        setMessage(`Error: ${data.error || "Unknown error"}`);
+        setMessage(`Error: ${data.error}`);
       }
     } catch (error) {
-      console.error(error);
       setMessage("An unexpected error occurred.");
     }
 
@@ -65,7 +62,6 @@ export default function RegisterAnimal() {
             multiple
             onChange={handleImageUpload}
             className="w-full p-2 border border-gray-300 rounded"
-            required
           />
         </div>
 
@@ -79,6 +75,20 @@ export default function RegisterAnimal() {
           {isLoading ? "Registering..." : "Register"}
         </button>
       </form>
+
+      <div className="flex flex-wrap gap-4 mt-4">
+        {images.map((image, index) => (
+          <div key={index} className="w-24 h-24">
+            <Image
+              src={URL.createObjectURL(image)}
+              alt={`Preview ${index}`}
+              className="w-full h-full object-cover rounded"
+              width={96}
+              height={96}
+            />
+          </div>
+        ))}
+      </div>
 
       {message && (
         <p className="mt-4 text-gray-800 font-semibold text-center">
