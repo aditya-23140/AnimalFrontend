@@ -1,4 +1,3 @@
-// pages/register.js
 "use client";
 import { useState } from "react";
 
@@ -20,10 +19,13 @@ export default function RegisterAnimal() {
     images.forEach((image) => formData.append("images", image));
 
     try {
-      const response = await fetch("http://localhost:8000/api/register/", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "http://localhost:8000/api/animals/register/",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
       const data = await response.json();
 
       if (response.ok) {
@@ -63,6 +65,7 @@ export default function RegisterAnimal() {
             multiple
             onChange={handleImageUpload}
             className="w-full p-2 border border-gray-300 rounded"
+            required
           />
         </div>
 

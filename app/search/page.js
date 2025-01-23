@@ -1,6 +1,6 @@
-// pages/search.js
 "use client";
 import { useState } from "react";
+import Image from "next/image";
 
 export default function SearchAnimal() {
   const [images, setImages] = useState([]);
@@ -22,18 +22,26 @@ export default function SearchAnimal() {
     images.forEach((image) => formData.append("images", image));
 
     try {
-      const response = await fetch("http://localhost:8000/api/search/", {
-        method: "POST",
-        body: formData,
-      });
+      const response = await fetch(
+        "http://localhost:8000/api/animals/search/",
+        {
+          method: "POST",
+          body: formData,
+        }
+      );
       const data = await response.json();
 
-      if (data.success) {
-        setResults(data.matches);
+      if (response.ok) {
+        if (data.success) {
+          setResults(data.matches);
+        } else {
+          setMessage(`Error: ${data.error}`);
+        }
       } else {
-        setMessage(`Error: ${data.error}`);
+        setMessage(`Error: ${data.error || "Unknown error"}`);
       }
     } catch (error) {
+      console.error(error);
       setMessage("An unexpected error occurred.");
     }
 
@@ -58,6 +66,7 @@ export default function SearchAnimal() {
             multiple
             onChange={handleImageUpload}
             className="w-full p-2 border border-gray-300 rounded"
+            required
           />
         </div>
 
@@ -94,7 +103,7 @@ export default function SearchAnimal() {
                 </p>
                 <div className="flex space-x-2 mt-2">
                   {result.images.map((img, i) => (
-                    <img
+                    <Image
                       key={i}
                       src={`http://localhost:8000/media/${img}`}
                       alt="Animal"
