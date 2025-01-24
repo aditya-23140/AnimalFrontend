@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 
 export default function SearchAnimal() {
@@ -7,9 +7,41 @@ export default function SearchAnimal() {
   const [isLoading, setIsLoading] = useState(false);
   const [results, setResults] = useState([]);
   const [message, setMessage] = useState("");
+  const videoRef = useRef(null);
+  const canvasRef = useRef(null);
 
-  const handleImageUpload = (e) => {
-    setImages([...e.target.files]);
+  useEffect(() => {
+    const getCamera = async () => {
+      try {
+        const stream = await navigator.mediaDevices.getUserMedia({
+          video: true,
+        });
+        videoRef.current.srcObject = stream;
+      } catch (error) {
+        console.error("Error accessing the camera:", error);
+      }
+    };
+
+    getCamera();
+
+    // Cleanup function to stop the video stream when the component unmounts
+    return () => {
+      if (videoRef.current) {
+        const stream = videoRef.current.srcObject;
+        if (stream) {
+          const tracks = stream.getTracks();
+          tracks.forEach((track) => track.stop());
+        }
+      }
+    };
+  }, []);
+
+  const captureImage = () => {
+    const canvas = canvasRef.current;
+    const context = canvas.getContext("2d");
+    context.drawImage(videoRef.current, 0, 0, canvas.width, canvas.height);
+    const imageData = canvas.toDataURL("image/png");
+    setImages([imageData]); // Set the captured image as the only image
   };
 
   const handleSubmit = async (e) => {
@@ -19,7 +51,18 @@ export default function SearchAnimal() {
     setResults([]);
 
     const formData = new FormData();
-    images.forEach((image) => formData.append("images", image));
+    images.forEach((image) => {
+      // Convert the base64 image to a Blob
+      const byteString = atob(image.split(",")[1]);
+      const mimeString = image.split(",")[0].split(":")[1].split(";")[0];
+      const ab = new ArrayBuffer(byteString.length);
+      const ia = new Uint8Array(ab);
+      for (let i = 0; i < byteString.length; i++) {
+        ia[i] = byteString.charCodeAt(i);
+      }
+      const blob = new Blob([ab], { type: mimeString });
+      formData.append("images", blob, "captured_image.png");
+    });
 
     try {
       const response = await fetch("http://localhost:8000/api/search_animal/", {
@@ -34,7 +77,7 @@ export default function SearchAnimal() {
         setMessage(`Error: ${data.error}`);
       }
     } catch (error) {
-      setMessage("An unexpected error occurred.");
+      setMessage("An unexpected error occurred. Please try again.");
     }
 
     setIsLoading(false);
@@ -50,15 +93,26 @@ export default function SearchAnimal() {
       >
         <div className="mb-4">
           <label className="block text-gray-700 text-sm font-bold mb-2">
-            Upload Images
+            Capture Image
           </label>
-          <input
-            type="file"
-            accept="image/*"
-            multiple
-            onChange={handleImageUpload}
-            className="w-full p-2 border border-gray-300 rounded"
+          <video
+            ref={videoRef}
+            autoPlay
+            className="w-full h-auto border border-gray-300 rounded mb-2"
           />
+          <canvas
+            ref={canvasRef}
+            style={{ display: "none" }}
+            width={640}
+            height={480}
+          />
+          <button
+            type="button"
+            onClick={captureImage}
+            className="w-full py-2 px-4 bg-blue-500 text-white font-bold rounded hover:bg-blue-600 transition"
+          >
+            Capture Image
+          </button>
         </div>
 
         <button
@@ -73,7 +127,25 @@ export default function SearchAnimal() {
       </form>
 
       {message && (
-        <p className="mt-4 text-red-500 font-semibold text-center">{message}</p>
+        <p className="mt-4 text-red-500 font-semibold text -center">
+          {message}
+        </p>
+      )}
+
+      {images.length > 0 && (
+        <div className="mt-4">
+          <h2 className="text-lg font-bold mb-2">Image Preview</h2>
+          <Image
+            src={images[0]}
+            alt="Captured Image"
+            className="w-16 h-16 object-cover border border-gray-300 rounded"
+            width={64}
+            height={64}
+            onError={(e) => {
+              e.target.src = "/fallback-image.jpg"; // Fallback image if fails
+            }}
+          />
+        </div>
       )}
 
       {results.length > 0 && (
