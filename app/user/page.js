@@ -2,6 +2,7 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
+// import Loader from "@/components/loader";
 import CirclesBackground from "@/components/background";
 import Link from "next/link";
 import { CiEdit } from "react-icons/ci";
