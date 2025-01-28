@@ -25,7 +25,6 @@ const User = () => {
             },
           }
         );
-
         if (!response.ok) {
           throw new Error("Failed to fetch profile data");
         }
@@ -157,7 +156,7 @@ const User = () => {
                           />
                         </div>
                       )}
-                      
+
                       <div className="flex w-fit absolute right-2 bottom-4 justify-end space-x-4">
                         <button
                           onClick={() => editPet(pet.id)}

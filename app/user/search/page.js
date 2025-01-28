@@ -136,7 +136,7 @@ export default function SearchPetForm() {
                   </p>
                   <p className="text-sm text-[#9ea4b0]">
                     Breed: {match.pet_details.breed}
-                  </p>
+                  </p>W
                   <p className="text-sm text-[#9ea4b0]">
                     Similarity: {(match.similarity * 100).toFixed(2)}%
                   </p>
