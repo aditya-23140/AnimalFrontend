@@ -18,6 +18,7 @@
     "flowbite": "^2.5.2",
     "flowbite-react": "^0.10.2",
     "framer-motion": "^11.11.9",
+    "jwt-decode": "^4.0.0",
     "mongo": "^0.1.0",
     "mongodb": "^6.9.0",
     "mongoose": "^8.7.1",

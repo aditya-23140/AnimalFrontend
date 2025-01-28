@@ -12,7 +12,8 @@ export default function AddPetForm() {
     category: "",
     type: "",
     breed: "",
-    photos: [],
+    images: [], // Single image field
+    features: [], // For extracted features
     isPublic: false,
     additionalInfo: {
       weight: "",
@@ -37,7 +38,9 @@ export default function AddPetForm() {
   };
 
   const handleFileChange = (files) => {
-    setPet({ ...pet, photos: Array.from(files) });
+    if (files.length > 0) {
+      setPet({ ...pet, images: [files[0]] }); // Store only the first file
+    }
   };
 
   const togglePublic = () => {
@@ -54,11 +57,19 @@ export default function AddPetForm() {
     formData.append("type", pet.type);
     formData.append("breed", pet.breed);
     formData.append("isPublic", pet.isPublic);
-    formData.append("additionalInfo", JSON.stringify(pet.additionalInfo)); // Send as stringified object
 
-    pet.photos.forEach((photo, index) => {
-      formData.append("photos", photo);
-    });
+    // 1. Fix additionalInfo formatting
+    const additionalInfo = pet.additionalInfo.subNotes
+      ? { ...pet.additionalInfo } // Include existing subNotes
+      : { ...pet.additionalInfo, subNotes: [] };
+    formData.append("additionalInfo", JSON.stringify(additionalInfo));
+
+    // 2. Fix images formatting (must be array)
+    if (pet.images.length > 0) {
+      pet.images.forEach((image) => {
+        formData.append("images", image); // Use plural field name
+      });
+    }
 
     try {
       const response = await fetch("http://localhost:8000/api/auth/pets/add/", {
@@ -95,7 +106,11 @@ export default function AddPetForm() {
                 Add Pet Details
               </h1>
 
-              <form id="submitForm" className="space-y-6" onSubmit={handleSubmit}>
+              <form
+                id="submitForm"
+                className="space-y-6"
+                onSubmit={handleSubmit}
+              >
                 <div className="space-y-4">
                   <div>
                     <label
@@ -193,28 +208,28 @@ export default function AddPetForm() {
 
                   <div>
                     <label
-                      htmlFor="photos"
+                      htmlFor="images"
                       className="block text-sm font-semibold text-[#9ea4b0] mb-1"
                     >
-                      Upload Photos
+                      Upload Image
                     </label>
                     <div className="relative">
                       <input
                         type="file"
-                        id="photos"
-                        name="photos"
+                        id="images"
+                        name="images"
                         accept="image/*"
                         multiple
                         onChange={(e) => handleFileChange(e.target.files)}
                         className="hidden"
                       />
                       <label
-                        htmlFor="photos"
+                        htmlFor="images"
                         className="flex items-center justify-center px-4 py-2 bg-[#3983fb] text-white font-bold rounded-lg cursor-pointer hover:bg-[#0b101a] hover:text-[#3983fb] hover:shadow-lg transition-all duration-300 ease-in-out"
                       >
-                        {pet.photos.length > 0
-                          ? `${pet.photos.length} file(s) selected`
-                          : "Choose Files"}
+                        {pet.images.length > 0
+                          ? `1 file selected`
+                          : "Choose File"}
                       </label>
                     </div>
                   </div>
@@ -226,7 +241,9 @@ export default function AddPetForm() {
                       onClick={() => setShowAdditionalInfo(!showAdditionalInfo)}
                       className="w-full bg-[#3983fb] text-white p-3 rounded-lg font-bold hover:bg-[#0b101a] hover:text-[#3983fb] transition duration-300 ease-in-out"
                     >
-                      {showAdditionalInfo ? "Hide Additional Info" : "Add Additional Info"}
+                      {showAdditionalInfo
+                        ? "Hide Additional Info"
+                        : "Add Additional Info"}
                     </button>
                   </div>
 
@@ -303,7 +320,10 @@ export default function AddPetForm() {
                         <button
                           type="button"
                           onClick={() => {
-                            const newSubNotes = [...pet.additionalInfo.subNotes, pet.subNote];
+                            const newSubNotes = [
+                              ...pet.additionalInfo.subNotes,
+                              pet.subNote,
+                            ];
                             setPet({
                               ...pet,
                               additionalInfo: {
@@ -320,9 +340,11 @@ export default function AddPetForm() {
                         <div>
                           {pet.additionalInfo.subNotes.length > 0 && (
                             <ul className="text-[#9ea4b0] mt-2">
-                              {pet.additionalInfo.subNotes.map((note, index) => (
-                                <li key={index}>{note}</li>
-                              ))}
+                              {pet.additionalInfo.subNotes.map(
+                                (note, index) => (
+                                  <li key={index}>{note}</li>
+                                )
+                              )}
                             </ul>
                           )}
                         </div>

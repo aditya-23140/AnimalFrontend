@@ -1,5 +1,6 @@
 import localFont from "next/font/local";
 import "./globals.css";
+import ProtectedRoute from "@/components/ProtectedRoute";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -21,11 +22,12 @@ export default async function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
-        <link rel="icon" href="/favicon.ico" sizes="50pxX50px"/>
+        <link rel="icon" href="/favicon.ico" sizes="50pxX50px" />
       </head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
+        <ProtectedRoute />
         <main>{children}</main>
       </body>
     </html>

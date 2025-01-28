@@ -2,7 +2,6 @@
 import React, { useEffect, useState } from "react";
 import Navbar from "@/components/navbar";
 import Footer from "@/components/footer";
-// import Loader from "@/components/loader";
 import CirclesBackground from "@/components/background";
 import Link from "next/link";
 import { CiEdit } from "react-icons/ci";
@@ -47,7 +46,7 @@ const User = () => {
   const deletePet = async (petId) => {
     try {
       const response = await fetch(
-        h`ttp://localhost:8000/api/auth/pets/${petId}/delete/`,
+        `http://localhost:8000/api/auth/pets/${petId}/delete/`,
         {
           method: "DELETE",
           headers: {
@@ -61,17 +60,28 @@ const User = () => {
         throw new Error("Failed to delete pet");
       }
 
-      // If successful, remove the pet from the UI without re-fetching the profile data
       setPets(pets.filter((pet) => pet.id !== petId));
     } catch (err) {
       setError(err.message);
     }
   };
 
-  const editPet = async (petId, newInfo) => {};
+  const editPet = (petId) => {
+    window.location.href = `/user/pets/${petId}/edit`;
+  };
 
-  if (loading) return <p>Loading...</p>;
-  if (error) return <p>Error: {error}</p>;
+  if (loading)
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        Loading...
+      </div>
+    );
+  if (error)
+    return (
+      <div className="min-h-screen flex items-center justify-center text-red-500">
+        Error: {error}
+      </div>
+    );
 
   return (
     <>
@@ -83,22 +93,12 @@ const User = () => {
             <h2 className="text-xl font-semibold mb-4">Recent Data</h2>
             <ul className="space-y-4">
               <li className="p-4 bg-gray-700 rounded-lg">
-                <strong>Recent Update:</strong> {pets[0]?.name}{" "}
+                <strong>Recent Update:</strong> {pets[0]?.name || "N/A"}
                 <div>
-                  Weight:{" "}
-                  {pets[0]?.additionalInfo
-                    ? JSON.parse(pets[0]?.additionalInfo).weight
-                    : "N/A"}{" "}
-                  <br />
-                  Height:{" "}
-                  {pets[0]?.additionalInfo
-                    ? JSON.parse(pets[0]?.additionalInfo).height
-                    : "N/A"}{" "}
-                  <br />
+                  Weight: {pets[0]?.additionalInfo?.weight || "N/A"} <br />
+                  Height: {pets[0]?.additionalInfo?.height || "N/A"} <br />
                   Sub Notes:{" "}
-                  {pets[0]?.additionalInfo
-                    ? JSON.parse(pets[0]?.additionalInfo).subNotes.join(", ")
-                    : "N/A"}
+                  {pets[0]?.additionalInfo?.subNotes?.join(", ") || "N/A"}
                 </div>
               </li>
             </ul>
@@ -113,9 +113,9 @@ const User = () => {
               />
               <div className="ml-4">
                 <h1 className="text-2xl font-bold">
-                  {owner ? owner.username : "Loading..."}
+                  {owner?.username || "Loading..."}
                 </h1>
-                <p className="text-gray-400">{owner ? owner.email : ""}</p>
+                <p className="text-gray-400">{owner?.email || ""}</p>
                 <p className="mt-1">Some bio about the pet owner goes here.</p>
               </div>
             </div>
@@ -130,9 +130,9 @@ const User = () => {
 
               {pets.length > 0 ? (
                 <ul className="space-y-4">
-                  {pets.map((pet, index) => (
+                  {pets.map((pet) => (
                     <li
-                      key={index}
+                      key={pet.id}
                       className="p-4 bg-gray-700 rounded-lg relative"
                     >
                       <div>Name: {pet.name}</div>
@@ -142,45 +142,37 @@ const User = () => {
                       <div>Is Public: {pet.isPublic ? "Yes" : "No"}</div>
 
                       <div>
-                        Weight:{" "}
-                        {pet.additionalInfo
-                          ? JSON.parse(pet.additionalInfo).weight
-                          : "N/A"}{" "}
-                        <br />
-                        Height:{" "}
-                        {pet.additionalInfo
-                          ? JSON.parse(pet.additionalInfo).height
-                          : "N/A"}{" "}
-                        <br />
+                        Weight: {pet.additionalInfo?.weight || "N/A"} <br />
+                        Height: {pet.additionalInfo?.height || "N/A"} <br />
                         Sub Notes:{" "}
-                        {pet.additionalInfo
-                          ? JSON.parse(pet.additionalInfo).subNotes.join(", ")
-                          : "N/A"}
+                        {pet.additionalInfo?.subNotes?.join(", ") || "N/A"}
                       </div>
 
-                      {/* Render Pet Image */}
-                      {pet.photos && (
+                      {pet.images?.length > 0 && (
                         <div className="mt-2 absolute top-0 right-4">
                           <img
-                            src={`http://localhost:8000${pet.photos}`}
-                            alt={pet.name}
-                            className="w-auto h-[8em] rounded-lg"
+                            src={`http://localhost:8000/media/${pet.images[0]}`}
+                            alt="Pet"
+                            className="w-32 h-32 object-cover rounded-lg"
                           />
                         </div>
                       )}
-                      {/* Delete Button */}
-                      <button
-                        onClick={() => editPet(pet.id, newInfo)}
-                        className="absolute bottom-[3em] right-3 text-white py-2 px-4 rounded-lg transition duration-200 scale-[2]"
-                      >
-                        <CiEdit />
-                      </button>
-                      <button
-                        onClick={() => deletePet(pet.id)}
-                        className="absolute bottom-2 right-3 bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg shadow-lg transition duration-200 scale-[0.8]"
-                      >
-                        Delete
-                      </button>
+                      
+                      <div className="flex w-fit absolute right-2 bottom-4 justify-end space-x-4">
+                        <button
+                          onClick={() => editPet(pet.id)}
+                          className="flex items-center bg-blue-500 hover:bg-blue-600 text-white py-2 px-4 rounded-lg transition duration-200"
+                        >
+                          <CiEdit className="mr-2" />
+                          Edit
+                        </button>
+                        <button
+                          onClick={() => deletePet(pet.id)}
+                          className="bg-red-500 hover:bg-red-600 text-white py-2 px-4 rounded-lg shadow-lg transition duration-200"
+                        >
+                          Delete
+                        </button>
+                      </div>
                     </li>
                   ))}
                 </ul>
