@@ -6,7 +6,7 @@ export const animalCategories = {
     types: ["Hens", "Ducks"],
   },
   Livestock: {
-    types: ["Sheep", "Goats"],
+    types: ["Sheep", "Goats", "Cattle"],
   },
   Wild: {
     types: ["Lion", "Tiger", "Bear"],

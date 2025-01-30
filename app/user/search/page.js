@@ -10,6 +10,7 @@ export default function SearchPetForm() {
   const [matches, setMatches] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
   const [backgroundHeight, setBackgroundHeight] = useState("auto");
+  const [searchPerformed, setSearchPerformed] = useState(false);
 
   useEffect(() => {
     setBackgroundHeight(window.innerHeight + 300);
@@ -54,6 +55,7 @@ export default function SearchPetForm() {
         const data = await response.json();
         setMatches(data.matches || []);
         console.log("Search results:", data);
+        setSearchPerformed(true);
       }
     } catch (error) {
       console.error("Network Error:", error);
@@ -123,40 +125,47 @@ export default function SearchPetForm() {
               </form>
 
               {/* Display search results */}
-              {matches.map((match, index) => (
-                <div
-                  key={index}
-                  className="p-4 bg-[#2b2f3a] rounded-lg shadow-md"
-                >
-                  <h3 className="text-lg font-semibold text-[#fefefe]">
-                    {match.pet_details.name}
-                  </h3>
-                  <p className="text-sm text-[#9ea4b0]">
-                    Type: {match.pet_details.type}
-                  </p>
-                  <p className="text-sm text-[#9ea4b0]">
-                    Breed: {match.pet_details.breed}
-                  </p>W
-                  <p className="text-sm text-[#9ea4b0]">
-                    Similarity: {(match.similarity * 100).toFixed(2)}%
-                  </p>
-                  {match.images && Array.isArray(match.images) && (
-                    <div className="mt-2">
-                      <p className="text-sm text-[#9ea4b0]">Images:</p>
-                      <div className="flex space-x-2">
-                        {match.images.map((image, idx) => (
-                          <img
-                            key={idx}
-                            src={`http://localhost:8000${image}`}
-                            alt={`Pet image ${idx + 1}`}
-                            className="w-16 h-16 object-cover rounded"
-                          />
-                        ))}
+              {matches.length > 0
+                ? matches.map((match, index) => (
+                    <div
+                      key={index}
+                      className="p-4 bg-[#2b2f3a] rounded-lg shadow-md mt-4 flex justify-between items-center"
+                    >
+                      <div className="details">
+                        <h3 className="text-lg font-semibold text-[#fefefe]">
+                          {match.pet_details.name}
+                        </h3>
+                        <p className="text-sm text-[#9ea4b0]">
+                          Type: {match.pet_details.type}
+                        </p>
+                        <p className="text-sm text-[#9ea4b0]">
+                          Breed: {match.pet_details.breed}
+                        </p>
+                        <p className="text-sm text-[#9ea4b0]">
+                          Similarity: {(match.similarity * 100).toFixed(2)}%
+                        </p>
+                      </div>
+                      <div className="images">
+                        {match.pet_details.images?.length > 0 && (
+                          <div className="mt-2 relative">
+                            {match.pet_details.images.map((image, idx) => (
+                              <img
+                                key={idx}
+                                src={`http://localhost:8000/media/${image}`}
+                                alt={`Pet image ${idx + 1}`}
+                                className="w-24 h-24 object-cover rounded-lg"
+                              />
+                            ))}
+                          </div>
+                        )}
                       </div>
                     </div>
+                  ))
+                : searchPerformed && (
+                    <p className="text-center text-yellow-400 font-bold bg-[#2b2f3a] p-3 rounded-lg mt-4">
+                      ⚠️ No similar pet found. Try again with different images.
+                    </p>
                   )}
-                </div>
-              ))}
             </div>
           </div>
         </div>

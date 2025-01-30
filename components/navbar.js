@@ -34,9 +34,12 @@ export default function Navbar() {
   };
 
   return (
-    <header className="flex justify-between items-center px-6 py-5 shadow-lg z-50">
-      <div className="text-3xl md:text-4xl font-bold">
-        <Link href="/">Pet<span className="text-blue-500">Gle</span></Link>
+    <>
+    <header className="flex justify-between items-center px-6 py-5 shadow-lg z-10">
+      <div className="text-3xl md:text-4xl font-bold text-white">
+        <Link href="/">
+          Paw<span className="text-blue-500">Gle</span>
+        </Link>
       </div>
 
       {/* Search Bar */}
@@ -50,9 +53,12 @@ export default function Navbar() {
 
       {/* Profile Section */}
       <div className="relative">
-        <button onClick={toggleDropdown} className="flex items-center space-x-2">
+        <button
+          onClick={toggleDropdown}
+          className="flex items-center space-x-2"
+        >
           <img
-            src="/animal.png" 
+            src="/animal.png"
             alt="Profile"
             className="w-10 h-10 rounded-full border-2 border-white"
           />
@@ -64,7 +70,7 @@ export default function Navbar() {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.3 }}
           >
-            <ul className="py-2">
+            <ul className="py-2 text-white">
               {/* Search Bar inside Dropdown for Small Screens */}
               <li className="px-4 py-2 hover:bg-gray-700 md:hidden">
                 <input
@@ -75,7 +81,9 @@ export default function Navbar() {
               </li>
               <li className="px-4 py-2 hover:bg-gray-700 flex items-center space-x-2">
                 <MdDashboard />
-                <Link href="/dashboard"><span>Dashboard</span></Link>
+                <Link href="/dashboard">
+                  <span>Dashboard</span>
+                </Link>
               </li>
               {/* <li className="px-4 py-2 hover:bg-gray-700 flex items-center space-x-2">
                 <FaEdit />
@@ -83,20 +91,35 @@ export default function Navbar() {
               </li> */}
               <li className="px-4 py-2 hover:bg-gray-700 flex items-center space-x-2">
                 <FaUser />
-                <Link href="/user"><span>Profile</span></Link>
+                <Link href="/user">
+                  <span>Profile</span>
+                </Link>
               </li>
               <li className="px-4 py-2 hover:bg-gray-700 flex items-center space-x-2">
                 <FaCog />
                 <span>Settings</span>
               </li>
-              <li className="px-4 py-2 hover:bg-gray-700 flex items-center space-x-2" onClick={logout}>
-                <FiLogOut className="text-[22px]"/>
-                {localStorage.getItem("accessToken") && localStorage.getItem("refreshToken") ? <Link href="/"><span>LogOut</span></Link> : <Link href="/login"><span>Login</span></Link>}
+              <li
+                className="px-4 py-2 hover:bg-gray-700 flex items-center space-x-2"
+                onClick={logout}
+              >
+                <FiLogOut className="text-[22px]" />
+                {localStorage.getItem("accessToken") &&
+                localStorage.getItem("refreshToken") ? (
+                  <Link href="/">
+                    <span>LogOut</span>
+                  </Link>
+                ) : (
+                  <Link href="/login">
+                    <span>Login</span>
+                  </Link>
+                )}
               </li>
             </ul>
           </motion.div>
         )}
       </div>
     </header>
+    </>
   );
 }

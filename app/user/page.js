@@ -124,6 +124,12 @@ const User = () => {
             >
               Add Pet
             </Link>
+            <Link
+              href="/user/search"
+              className="absolute right-32 bg-lime-600 hover:bg-lime-800 text-white py-2 px-4 rounded-lg shadow-lg transition duration-200"
+            >
+              Search Pet
+            </Link>
             <div className="mb-6">
               <h2 className="text-2xl font-semibold mb-4">Pets Registered</h2>
 
